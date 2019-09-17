@@ -1,4 +1,4 @@
-package roaring
+package rhash
 
 import (
 	"log"
@@ -19,20 +19,17 @@ func generateIndex() uint64 {
 }
 
 func BenchmarkBitmap64(b *testing.B) {
-	b.ReportAllocs()
-
 	rand.Seed(1)
-
+	b.ReportAllocs()
 	bitmap := NewBitmap64()
 	b.N = 1e6
 	log.Printf("the value of b.N: %v", b.N)
 	PrintMemUsage()
-	time.Sleep(time.Millisecond * 300)
+	time.Sleep(300 * time.Millisecond)
 	loadBitmap(bitmap, uint64(b.N), 12)
 	PrintMemUsage()
 	b.ResetTimer()
 	b.StartTimer()
-
 	rand.Seed(1)
 	count := 0
 	for i := 0; i < b.N; i++ {
@@ -42,21 +39,11 @@ func BenchmarkBitmap64(b *testing.B) {
 		}
 	}
 	b.StopTimer()
+	log.Printf("bitmap size: %d", bitmap.Size())
+	log.Printf("bitmap set count: %d", count)
 
-	log.Printf("bitmap size: %d", len(bitmap.keys))
-	arrayCount, bitmapCount := 0, 0
-	for _, container := range bitmap.containers {
-		switch container.(type) {
-		case *arrayContainer:
-			arrayCount++
-		case *bitmapContainer:
-			bitmapCount++
-		}
-	}
-	time.Sleep(time.Millisecond * 200)
-	log.Printf("arrayCount: %d, bitmapCount: %d", arrayCount, bitmapCount)
-	log.Printf("total set bits := %v", count)
 	PrintMemUsage()
+	return
 }
 
 func loadBitmap(bitmap *Bitmap64, size uint64, goroutines int) {

@@ -1,13 +1,12 @@
 package sparse
 
 import (
+	"log"
 	"math/rand"
 	"runtime"
 	"sync"
 	"testing"
 	"time"
-
-	"git.garena.com/common/gocommon"
 )
 
 func generateIndex() uint64 {
@@ -20,19 +19,11 @@ func generateIndex() uint64 {
 }
 
 func BenchmarkBitmap64(b *testing.B) {
-	gocommon.LoggerInit("log/error.log", 3600*24, 1024*1024*128, 10, 3)
-
-	// go func() {
-	// 	for {
-	// 		PrintMemUsage()
-	// 		time.Sleep(400 * time.Millisecond)
-	// 	}
-	// }()
 	rand.Seed(1)
 	b.ReportAllocs()
 	bitmap := NewBitmap64()
 	b.N = 1e9
-	gocommon.LogDetailf("the value of b.N: %v", b.N)
+	log.Printf("the value of b.N: %v", b.N)
 	PrintMemUsage()
 	time.Sleep(300 * time.Millisecond)
 	loadBitmap(bitmap, uint64(b.N), 12)
@@ -48,8 +39,8 @@ func BenchmarkBitmap64(b *testing.B) {
 		}
 	}
 	b.StopTimer()
-	gocommon.LogDetailf("bitmap size: %d", bitmap.Size())
-	gocommon.LogDetailf("bitmap set count: %d", count)
+	log.Printf("bitmap size: %d", bitmap.Size())
+	log.Printf("bitmap set count: %d", count)
 
 	PrintMemUsage()
 	return
@@ -85,10 +76,10 @@ func PrintMemUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	gocommon.LogDetailf("Alloc = %v MiB", bToMb(m.Alloc))
-	gocommon.LogDetailf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
-	gocommon.LogDetailf("\tSys = %v MiB", bToMb(m.Sys))
-	gocommon.LogDetailf("\tNumGC = %v\n", m.NumGC)
+	log.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	log.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+	log.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	log.Printf("\tNumGC = %v\n", m.NumGC)
 }
 
 func bToMb(b uint64) uint64 {
